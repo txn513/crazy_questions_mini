@@ -116,5 +116,15 @@ Page({
       }
     })
   },
+  sum(data) {
+    wx.cloud.callFunction({
+      name: 'testAdd',
+      data: data
+    }).then(console.log)
+  },
+  formSubmit(e){
+    console.log(e.detail.value)
+    this.sum(e.detail.value)
+  },
 
 })
