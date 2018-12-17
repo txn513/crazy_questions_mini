@@ -1,2 +1,15 @@
 <!--miniprogram/pages/questions/questions.wxml-->
-<view class='container'>question</view>
+<view class='container'>
+  <view class='wrap' style='height: {{windowHeight + "px"}}'>
+    <view class='top' style='height: {{windowHeight/10*1.5 + "px"}}'></view>
+    <view class='question' style='height: {{windowHeight/10*3.2 + "px"}}'>
+      <text>你的名字你的名字你的名字你的名字你的名字你的名字你的名字你的名字你的名字</text>
+    </view>
+    <view class='answers' style='height: {{windowHeight/10*5.3 + "px"}}'>
+      <view class='ans-item'>字你的</view>
+      <view class='ans-item'>字你的</view>
+      <view class='ans-item'>字你的</view>
+      <view class='ans-item'>字你的</view>
+    </view>
+  </view>
+</view>

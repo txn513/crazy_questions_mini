@@ -2,3 +2,41 @@
 page {
   background: #4e556f;
 }
+.wrap {
+  box-sizing: border-box;
+  width: 100%;
+}
+.top {
+  /* background: red; */
+}
+.question {
+  display: flex;
+  box-sizing: border-box;
+  text-align: left;
+  padding: 0 60rpx;
+  align-items: center;
+}
+.question text {
+  color: #eee;
+  font-size: 40rpx;
+}
+.answers {
+  display: flex;
+  flex-direction: column;
+  /* background: gray; */
+  justify-content: flex-start;
+  align-items: center;
+}
+.ans-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 70%;
+  height: 14%;
+  border-radius: 10rpx;
+  /* border: 1px solid #fff; */
+  /* color: #888; */
+  background: #fff;
+  margin-bottom: 24rpx;
+  font-size: 26rpx;
+}
