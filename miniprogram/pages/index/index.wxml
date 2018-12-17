@@ -41,9 +41,11 @@
   </view>
 
 
-  <view class="uploader" bindtap='sum'>
+  <view class="uploader">
     
-      <text>sum</text>
+      <navigator url="../questions/questions" open-type="navigate" class="uploader-text">
+      <text>答题</text>
+    </navigator>
   </view>
 
 

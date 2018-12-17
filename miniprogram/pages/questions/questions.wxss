@@ -1,0 +1,4 @@
+/* miniprogram/pages/questions/questions.wxss */
+page {
+  background: #4e556f;
+}
