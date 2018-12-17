@@ -12,7 +12,7 @@ exports.main = async(event, context) => {
       _openid: event.openid // 填入当前用户 openid
     }).get();
     console.log(res);
-    if (res != null) {
+    if (res.data.length != 0) {
       const resultObj = {};
       resultObj.code = 201;
       resultObj.msg = "该用户已存在！";
@@ -24,7 +24,7 @@ exports.main = async(event, context) => {
           _openid: event.openid,
           appid: event.appid,
           unionid: event.unionid,
-          createTime: new Date(new Date().getTime() + 28800 * 1000)
+          createTime: new Date(new Date().getTime())
         }
       })
     }
