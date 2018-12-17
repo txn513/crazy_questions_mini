@@ -39,18 +39,4 @@
       <text>快速新建云函数</text>
     </navigator>
   </view>
-
-
-  <view class="uploader" bindtap='sum'>
-    
-      <text>sum</text>
-  </view>
-
-
-<form bindsubmit="formSubmit">
-  <input name="a" type='text' class='input' placeholder='输入a'></input>
-  <input name="b" type='text' class='input' placeholder='输入b'></input>
-  <button form-type="submit">Submit</button>
-</form>
-
 </view>

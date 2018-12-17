@@ -10,7 +10,7 @@ Page({
     requestResult: ''
   },
 
-  onLoad: function() {
+  onLoad: function () {
     if (!wx.cloud) {
       wx.redirectTo({
         url: '../chooseLib/chooseLib',
@@ -36,7 +36,7 @@ Page({
     })
   },
 
-  onGetUserInfo: function(e) {
+  onGetUserInfo: function (e) {
     if (!this.logged && e.detail.userInfo) {
       this.setData({
         logged: true,
@@ -46,16 +46,27 @@ Page({
     }
   },
 
-  onGetOpenid: function() {
+  onGetOpenid: function () {
     // 调用云函数
     wx.cloud.callFunction({
       name: 'login',
       data: {},
       success: res => {
-        console.log('[云函数] [login] user openid: ', res.result.openid)
+        //console.log('[云函数] [login] user openid: ', res.result.openid)
         app.globalData.openid = res.result.openid
-        wx.navigateTo({
-          url: '../userConsole/userConsole',
+        wx.cloud.callFunction({
+          name: 'addUser',
+          data: {
+            openid: res.result.openid,
+            appid: res.result.appid,
+            unionid: res.result.unionid
+          },
+          success: res => {
+            console.log(res);
+            wx.navigateTo({
+              url: '../userConsole/userConsole',
+            })
+          }
         })
       },
       fail: err => {
@@ -81,7 +92,7 @@ Page({
         })
 
         const filePath = res.tempFilePaths[0]
-        
+
         // 上传图片
         const cloudPath = 'my-image' + filePath.match(/\.[^.]+?$/)[0]
         wx.cloud.uploadFile({
@@ -93,7 +104,7 @@ Page({
             app.globalData.fileID = res.fileID
             app.globalData.cloudPath = cloudPath
             app.globalData.imagePath = filePath
-            
+
             wx.navigateTo({
               url: '../storageConsole/storageConsole'
             })
@@ -115,16 +126,6 @@ Page({
         console.error(e)
       }
     })
-  },
-  sum(data) {
-    wx.cloud.callFunction({
-      name: 'testAdd',
-      data: data
-    }).then(console.log)
-  },
-  formSubmit(e){
-    console.log(e.detail.value)
-    this.sum(e.detail.value)
-  },
+  }
 
 })
