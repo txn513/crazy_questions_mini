@@ -5,14 +5,28 @@ Page({
    * 页面的初始数据
    */
   data: {
+    testQ: {
 
+    }
+  },
+
+  getQuestions(){
+    wx.cloud.callFunction({
+      // 云函数名称
+      name: 'getQuestions',
+      // 传给云函数的参数
+    })
+      .then(res => {
+        console.log(res.result) // 3
+      })
+      .catch(console.error)
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-
+    this.getQuestions()
   },
 
   /**
