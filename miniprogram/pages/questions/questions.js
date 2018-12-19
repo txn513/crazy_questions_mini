@@ -20,6 +20,10 @@ Page({
     wx.cloud.callFunction({
       // 云函数名称
       name: 'getQuestions',
+      data: {
+        page: 0,
+        rows: 9,
+      },
       // 传给云函数的参数
     }).then(res => {
         console.log(res.result) // 3
