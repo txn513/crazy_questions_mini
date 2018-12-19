@@ -1,4 +1,5 @@
 // miniprogram/pages/questions/questions.js
+const app = getApp()
 Page({
 
   /**
@@ -11,7 +12,9 @@ Page({
     currentIndex: 0, //当前题目下标
     questionList: null, //问题list
     currentQuestion: null, //当前问题
-    // currectSelections: [], //当前选项
+    currectSelections: [], //当前选项
+    selectionColorShow: false,
+    clickSelec: '',
   },
 
   getQuestions(){
@@ -22,23 +25,73 @@ Page({
       name: 'getQuestions',
       data: {
         page: 0,
-        rows: 9,
+        rows: 90,
       },
       // 传给云函数的参数
     }).then(res => {
         console.log(res.result) // 3
+        
+      
         that.setData({
           questionList: res.result.data,
-          currentQuestion: res.result.data[currentIndex]
+          
         })
+      this.getSelections(currentIndex)
       })
       .catch(console.error)
   },
 
+  getSelections(currentIndex){
+    let { questionList} = this.data;
+    let currentQuestion = questionList[currentIndex]
+    let _arr = [];
+    for (let key in currentQuestion) {
+      if (key.indexOf('answer_')> -1) {
+        let _obj = {}
+        if (key.indexOf('_a') > -1) {
+          _obj['tag'] = "A"
+        } else if (key.indexOf('_b') > -1) {
+          _obj['tag'] = "B"
+        } else if (key.indexOf('_c') > -1) {
+          _obj['tag'] = "C"
+        } else if (key.indexOf('_d') > -1) {
+          _obj['tag'] = "D"
+        }
+        
+        _obj['value'] = currentQuestion[key]
+        _arr.push(_obj)
+      }
+      
+    }
+
+    console.log(_arr)
+    this.setData({
+      currectSelections: _arr,
+      currentQuestion
+    })
+  },
+
   awsClick(e){
     let { aws } = e.currentTarget.dataset; 
+    let { currentQuestion } = this.data;
     console.log(aws)
-    this.checkAnswer(aws)
+    // this.checkAnswer(aws)
+
+    //本地判断
+    this.addRecords(aws == currentQuestion.correct_answer)
+    this.setData({
+      selectionColorShow: true,
+      clickSelec: aws
+    })
+
+    setTimeout(() => {
+      this.setData({
+        selectionColorShow: false,
+        currentIndex: this.data.currentIndex+1,
+        clickSelec:''
+      })
+      this.getSelections(this.data.currentIndex)
+    }, 3000)
   },
 
   checkAnswer(aws){
@@ -53,10 +106,29 @@ Page({
       // 传给云函数的参数
     }).then(res => {
       console.log(res.result) // 3
-     
+
     }).catch(console.error)
   },
 
+  addRecords(isTrue){
+    let { currentQuestion } = this.data;
+    console.log({
+      openid: app.globalData.openid,
+      questionId: currentQuestion._id,
+      isTrue
+    })
+    wx.cloud.callFunction({
+      name: 'addRecords',
+      data: {
+        openid: app.globalData.openid,
+        questionId: currentQuestion._id,
+        isTrue
+      }
+    }).then(res => {
+      console.log(res.result) // 3
+
+    }).catch(console.error)
+  },
   /**
    * 生命周期函数--监听页面加载
    */

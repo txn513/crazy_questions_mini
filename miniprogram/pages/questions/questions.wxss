@@ -40,3 +40,12 @@ page {
   margin-bottom: 24rpx;
   font-size: 26rpx;
 }
+.ans-item.current {
+  background: #15d37b;
+}
+.ans-item.wrong {
+  background: #ff7271;
+}
+.ans-item.hideColor {
+  background: #fff;
+}
