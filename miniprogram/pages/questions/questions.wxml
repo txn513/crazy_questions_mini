@@ -3,13 +3,13 @@
   <view class='wrap' style='height: {{windowHeight + "px"}}'>
     <view class='top' style='height: {{windowHeight/10*1.5 + "px"}}'></view>
     <view class='question' style='height: {{windowHeight/10*3.2 + "px"}}'>
-      <text>你的名字你的名字你的名字你的名字你的名字你的名字你的名字你的名字你的名字</text>
+      <text>{{currentQuestion.questions}}</text>
     </view>
     <view class='answers' style='height: {{windowHeight/10*5.3 + "px"}}'>
-      <view class='ans-item'>字你的</view>
-      <view class='ans-item'>字你的</view>
-      <view class='ans-item'>字你的</view>
-      <view class='ans-item'>字你的</view>
+      <view class='ans-item' data-aws="A" catchtap="awsClick">{{currentQuestion.answer_a}}</view>
+      <view class='ans-item' data-aws="B" catchtap="awsClick">{{currentQuestion.answer_b}}</view>
+      <view class='ans-item' data-aws="C" catchtap="awsClick">{{currentQuestion.answer_c}}</view>
+      <view class='ans-item' data-aws="D" catchtap="awsClick">{{currentQuestion.answer_d}}</view>
     </view>
   </view>
 </view>
