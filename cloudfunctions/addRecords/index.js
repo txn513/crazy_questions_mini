@@ -5,6 +5,7 @@ cloud.init()
 const db = cloud.database();
 const _ = db.command;
 const records = db.collection("records");
+const rushRecords = db.collection("rushRecords");
 let errCount = 0;
 let correctCount = 0;
 let recordId = '';
@@ -18,7 +19,14 @@ exports.main = async(event, context) => {
   correctCount = res.data.length > 0 ? res.data[0].correctCount : correctCount;
   errCount = res.data.length > 0 ? res.data[0].errCount : errCount;
   recordId = res.data.length > 0 ? res.data[0]._id : recordId;
+  
+  //判断是否有闯关记录
+  const result = await rushRecords.where({
+    _openid: _.eq(event.openid)
+  }).get();
+  let rushRecordId = result.data.length > 0 ? result.data[0]._id : '';
   if (res.data.length > 0) {
+    //判断用户是否有答题记录，如果存在，则更新答对答错数据统计
     const res = await records.doc(recordId).update({
       data: {
         correctCount: event.isTrue ? _.inc(1) : correctCount,
@@ -26,7 +34,14 @@ exports.main = async(event, context) => {
         updateTime: new Date(new Date().getTime())
       }
     })
-    return res;
+    //判断用户是否有闯关记录，如果有，则更新最近记录
+    const rush = await rushRecords.doc(rushRecordId).update({
+      data: {
+        newestRecord: event.rushRecord,
+        updateTime: new Date(new Date().getTime())
+      }
+    })
+    return rush;
   } else {
     const res = await records.add({
       data: {
@@ -38,6 +53,30 @@ exports.main = async(event, context) => {
         updateTime: new Date(new Date().getTime())
       }
     })
-    return res;
+    if (result.data.length == 0){
+      //无闯关记录，则进行新增操作
+      const res = await rushRecords.add({
+        data: {
+          _openid: event.openid,
+          topRecord: event.rushRecord,
+          newestRecord: event.rushRecord,
+          createTime: new Date(new Date().getTime()),
+          updateTime: new Date(new Date().getTime())
+        }
+      })
+      return res;
+    }else{
+      //有闯关记录，则进行修改闯关记录
+      const res = await rushRecords.doc(rushRecordId).update({
+        data: {
+          topRecord: event.rushRecord,
+          newestRecord: event.rushRecord,
+          updateTime: new Date(new Date().getTime())
+        }
+      })
+      return res;
+    }
+    
   }
+
 }
