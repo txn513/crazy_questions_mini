@@ -1,5 +1,6 @@
 //index.js
 const app = getApp()
+let util = require('../../utils/util.js');
 
 Page({
   data: {
@@ -17,6 +18,11 @@ Page({
       })
       return
     }
+
+    //获取闯关数
+    util.ifGotOpenid(app, () => {
+      this.getRushRecords(app.globalData.openid)
+    })
 
     // 获取用户信息
     wx.getSetting({
@@ -126,6 +132,22 @@ Page({
         console.error(e)
       }
     })
-  }
+  },
+
+  //获取用户答题信息，例如闯关数
+  getRushRecords(openId){
+    wx.cloud.callFunction({
+      name: 'getRushRecords',
+      data: {
+        openId
+      },
+      success: res => {
+        console.log(res)
+      },
+      fail: err => {
+        
+      }
+    })
+  },
 
 })

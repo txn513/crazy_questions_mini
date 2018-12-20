@@ -1,4 +1,5 @@
 // miniprogram/pages/questions/questions.js
+let util = require('../../utils/util.js');
 const app = getApp()
 Page({
 
@@ -15,6 +16,7 @@ Page({
     currectSelections: [], //当前选项
     selectionColorShow: false,
     clickSelec: '',
+    page: 0,
   },
 
   getQuestions(){
@@ -24,7 +26,7 @@ Page({
       // 云函数名称
       name: 'getQuestions',
       data: {
-        page: 0,
+        page: this.data.page,
         rows: 90,
       },
       // 传给云函数的参数
@@ -78,20 +80,34 @@ Page({
     // this.checkAnswer(aws)
 
     //本地判断
-    this.addRecords(aws == currentQuestion.correct_answer)
-    this.setData({
-      selectionColorShow: true,
-      clickSelec: aws
-    })
+    util.ifGotOpenid(app, () => {
+      this.addRecords(aws == currentQuestion.correct_answer);
 
-    setTimeout(() => {
       this.setData({
-        selectionColorShow: false,
-        currentIndex: this.data.currentIndex+1,
-        clickSelec:''
+        selectionColorShow: true,
+        clickSelec: aws
       })
-      this.getSelections(this.data.currentIndex)
-    }, 3000)
+
+      setTimeout(() => {
+        this.setData({
+          selectionColorShow: false,
+          currentIndex: this.data.currentIndex + 1,
+          clickSelec: ''
+        })
+        this.getSelections(this.data.currentIndex)
+      }, 3000)
+    })
+    // if (app.globalData.openid) {
+    //   this.addRecords(aws == currentQuestion.correct_answer)
+    // } else {
+    //   app.userCallback = openid => {
+    //     if (openid) {
+    //       this.addRecords(aws == currentQuestion.correct_answer)
+    //     }
+    //   }
+    // }
+    
+    
   },
 
   checkAnswer(aws){
@@ -112,17 +128,20 @@ Page({
 
   addRecords(isTrue){
     let { currentQuestion } = this.data;
+    
     console.log({
       openid: app.globalData.openid,
       questionId: currentQuestion._id,
-      isTrue
+      isTrue,
+      rushRecord: this.data.page + '-' + this.data.currentIndex
     })
     wx.cloud.callFunction({
       name: 'addRecords',
       data: {
         openid: app.globalData.openid,
         questionId: currentQuestion._id,
-        isTrue
+        isTrue,
+        rushRecord: this.data.page +'-' + this.data.currentIndex
       }
     }).then(res => {
       console.log(res.result) // 3
