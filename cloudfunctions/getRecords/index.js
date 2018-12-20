@@ -9,7 +9,6 @@ const _ = db.command;
 // 云函数入口函数
 exports.main = async(event, context) => {
   const res = await trueRecords.where({
-    isTrue: event.isTrue,
     _openid: _.eq(event.openid)
     
   }).get();
