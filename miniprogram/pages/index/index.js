@@ -8,7 +8,9 @@ Page({
     userInfo: {},
     logged: false,
     takeSession: false,
-    requestResult: ''
+    requestResult: '',
+    canIUse: wx.canIUse('button.open-type.getUserInfo'),
+    userInfoAuth: false
   },
 
   onLoad: function () {
@@ -33,7 +35,8 @@ Page({
             success: res => {
               this.setData({
                 avatarUrl: res.userInfo.avatarUrl,
-                userInfo: res.userInfo
+                userInfo: res.userInfo,
+                userInfoAuth: true
               })
             }
           })
@@ -60,20 +63,20 @@ Page({
       success: res => {
         //console.log('[云函数] [login] user openid: ', res.result.openid)
         app.globalData.openid = res.result.openid
-        wx.cloud.callFunction({
-          name: 'addUser',
-          data: {
-            openid: res.result.openid,
-            appid: res.result.appid,
-            unionid: res.result.unionid
-          },
-          success: res => {
-            console.log(res);
-            wx.navigateTo({
-              url: '../userConsole/userConsole',
-            })
-          }
-        })
+        // wx.cloud.callFunction({
+        //   name: 'addUser',
+        //   data: {
+        //     openid: res.result.openid,
+        //     appid: res.result.appid,
+        //     unionid: res.result.unionid
+        //   },
+        //   success: res => {
+        //     console.log(res);
+        //     wx.navigateTo({
+        //       url: '../userConsole/userConsole',
+        //     })
+        //   }
+        // })
       },
       fail: err => {
         console.error('[云函数] [login] 调用失败', err)
@@ -135,11 +138,11 @@ Page({
   },
 
   //获取用户答题信息，例如闯关数
-  getRushRecords(openId){
+  getRushRecords(openid){
     wx.cloud.callFunction({
       name: 'getRushRecords',
       data: {
-        openId
+        openid
       },
       success: res => {
         console.log(res)
@@ -149,5 +152,44 @@ Page({
       }
     })
   },
+
+  //获取
+  bindGetUserInfo(e) {
+    if (!e.detail.userInfo) {
+      console.log('用户拒绝')
+      return;
+    }
+    console.log(e.detail.userInfo)
+    let { userInfoAuth } = this.data;
+    if (userInfoAuth) {
+      wx.navigateTo({
+        url: '/pages/questions/questions',
+      })
+    } else {
+      let { avatarUrl, city, country, gender, nickName, province } = e.detail.userInfo
+      util.ifGotOpenid(app, () => {
+        wx.cloud.callFunction({
+          name: 'updateUser',
+          data: {
+            openid: app.globalData.openid,
+            avatarUrl,
+            city,
+            country,
+            gender,
+            nickName,
+            province
+          },
+          success: res => {
+            console.log(res);
+            wx.navigateTo({
+                url: '/pages/questions/questions',
+            })
+          }
+        })
+      })
+      
+    }
+    
+  }
 
 })
