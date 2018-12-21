@@ -32,7 +32,11 @@ exports.main = async(event, context) => {
       const resultObj = {};
       resultObj.code = 200;
       resultObj.msg = "添加用户信息成功！";
-      resultObj.openid = openid;
+      resultObj.openid = {
+        openid: openid,
+        appid:appid,
+        unionid: unionid
+      };
       return resultObj;
     }
   } catch (e) {
