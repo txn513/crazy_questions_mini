@@ -24,9 +24,8 @@ exports.main = async(event, context) => {
           _openid: event.openid,
           appid: event.appid,
           unionid: event.unionid,
-          userImg:event.userImg,
-          username:event.username,
-          createTime: new Date(new Date().getTime())
+          createTime: new Date(new Date().getTime()),
+          updateTime: new Date(new Date().getTime())
         }
       })
     }
