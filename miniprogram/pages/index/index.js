@@ -180,7 +180,7 @@ Page({
             province
           },
           success: res => {
-            console.log(res);
+            console.log(res + '-------------------');
             wx.navigateTo({
                 url: '/pages/questions/questions',
             })
