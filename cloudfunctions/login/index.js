@@ -17,9 +17,14 @@ exports.main = async(event, context) => {
       const resultObj = {};
       resultObj.code = 201;
       resultObj.msg = "该用户已存在！";
+      resultObj.data = {
+        openid: openid,
+        appid: appid,
+        unionid: unionid
+      };
       return resultObj;
     } else {
-      const result =  await userInfo.add({
+      const result = await userInfo.add({
         // data 字段表示需新增的 JSON 数据
         data: {
           _openid: openid,
@@ -32,9 +37,9 @@ exports.main = async(event, context) => {
       const resultObj = {};
       resultObj.code = 200;
       resultObj.msg = "添加用户信息成功！";
-      resultObj.openid = {
+      resultObj.data = {
         openid: openid,
-        appid:appid,
+        appid: appid,
         unionid: unionid
       };
       return resultObj;
