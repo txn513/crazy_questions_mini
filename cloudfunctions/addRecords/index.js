@@ -6,6 +6,7 @@ const db = cloud.database();
 const _ = db.command;
 const records = db.collection("records");
 const rushRecords = db.collection("rushRecords");
+const userInfo = db.collection("userInfo");
 let errCount = 0;
 let correctCount = 0;
 let recordId = '';
@@ -19,7 +20,7 @@ exports.main = async(event, context) => {
   correctCount = res.data.length > 0 ? res.data[0].correctCount : correctCount;
   errCount = res.data.length > 0 ? res.data[0].errCount : errCount;
   recordId = res.data.length > 0 ? res.data[0]._id : recordId;
-  
+
   //判断是否有闯关记录
   const result = await rushRecords.where({
     _openid: _.eq(event.openid)
@@ -53,7 +54,17 @@ exports.main = async(event, context) => {
         updateTime: new Date(new Date().getTime())
       }
     })
-    if (result.data.length == 0){
+    if (res._id) {
+      const res = await userInfo.where({
+        _openid: event.openid,
+      }).update({
+          data: {
+            answerCount: _.inc(1),
+            updateTime: new Date(new Date().getTime())
+          }
+        })
+    }
+    if (result.data.length == 0) {
       //无闯关记录，则进行新增操作
       const res = await rushRecords.add({
         data: {
@@ -63,9 +74,19 @@ exports.main = async(event, context) => {
           createTime: new Date(new Date().getTime()),
           updateTime: new Date(new Date().getTime())
         }
-      })
+      });
+      if (res._id) {
+        const res = await userInfo.where({
+          _openid: event.openid,
+        }).update({
+          data: {
+            userLevel: event.rushRecord.split("-")[0],
+            updateTime: new Date(new Date().getTime())
+          }
+        })
+      }
       return res;
-    }else{
+    } else {
       //有闯关记录，则进行修改闯关记录
       const res = await rushRecords.doc(rushRecordId).update({
         data: {
@@ -76,7 +97,7 @@ exports.main = async(event, context) => {
       })
       return res;
     }
-    
+
   }
 
 }
