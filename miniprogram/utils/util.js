@@ -23,7 +23,7 @@ const getOpenid = (app) => {
       success: res => {
         //console.log('[云函数] [login] user openid: ', res.result.openid)
         app.globalData.openid = res.result.data.openid
-        console.log(res.result.data.openid)
+        console.log(res.result)
         if (app.userCallback) {
           app.userCallback(res.result.openid)
         }

@@ -17,14 +17,26 @@ Page({
     selectionColorShow: false,
     clickSelec: '',
     page: 0,
+    disableClick: false,
+    accuracyRate: 0,
+    correntSum:0,
+    errorSum:0
   },
 
   //获取题目
-  getQuestions(recordRes){
+  getQuestions(res){
     let that = this;
+    console.log(res)
     let { currentIndex} = this.data;
-
-    console.log(recordRes)
+    let { accuracyRate,correntSum,errorSum} = res.userInfo;
+    let recordRes = []
+    if (res.rushRecords) {
+      recordRes = res.rushRecords.newestRecord.split('-');
+    } else {
+      recordRes = [0, -1];
+    }
+    
+    
     wx.cloud.callFunction({
       // 云函数名称
       name: 'getQuestions',
@@ -40,7 +52,9 @@ Page({
         that.setData({
           currentIndex: parseInt(recordRes[1])+1,
           questionList: res.result.data,
-          
+          accuracyRate,
+          correntSum,
+          errorSum
         })
       this.getSelections(this.data.currentIndex)
       })
@@ -78,13 +92,21 @@ Page({
   },
 
   awsClick(e){
+    
     let { aws } = e.currentTarget.dataset; 
-    let { currentQuestion } = this.data;
+    let { currentQuestion, disableClick} = this.data;
+     this.setData({
+       disableClick: true
+     })
+    if (disableClick) {
+      return
+    }
     console.log(aws)
     // this.checkAnswer(aws)
 
     //本地判断
     util.ifGotOpenid(app, () => {
+      //更新数据
       this.addRecords(aws == currentQuestion.correct_answer);
 
       this.setData({
@@ -97,11 +119,12 @@ Page({
         this.setData({
           selectionColorShow: false,
           currentIndex: this.data.currentIndex + 1,
-          clickSelec: ''
+          clickSelec: '',
+          disableClick: false
         })
         console.log(this.data.currentIndex)
         this.getSelections(this.data.currentIndex)
-      }, 3000)
+      }, 2000)
     })
     // if (app.globalData.openid) {
     //   this.addRecords(aws == currentQuestion.correct_answer)
@@ -133,7 +156,7 @@ Page({
   },
 
   addRecords(isTrue){
-    let { currentQuestion } = this.data;
+    let { currentQuestion, accuracyRate, correntSum, errorSum } = this.data;
     
     console.log({
       openid: app.globalData.openid,
@@ -141,13 +164,27 @@ Page({
       isTrue,
       rushRecord: this.data.page + '-' + this.data.currentIndex
     })
+    if (isTrue) {
+      correntSum++
+    } else {
+      errorSum++
+    }
+    accuracyRate = correntSum / (correntSum + errorSum)
+    this.setData({
+      accuracyRate,
+      correntSum,
+      errorSum
+    })
     wx.cloud.callFunction({
       name: 'addRecords',
       data: {
         openid: app.globalData.openid,
         questionId: currentQuestion._id,
         isTrue,
-        rushRecord: this.data.page +'-' + this.data.currentIndex
+        rushRecord: this.data.page +'-' + this.data.currentIndex,
+        accuracyRate,
+        correntSum,
+        errorSum
       }
     }).then(res => {
       console.log(res.result) // 3
@@ -165,12 +202,13 @@ Page({
         },
         success: res => {
           console.log(res.result)
-          if (res.result) {
-            resolve(res.result.newestRecord.split('-'))
-          } else {
-            resolve([0,-1])
-          }
-          
+          // if (res.result.data.rushRecords) {    
+          //   // resolve(res.result.data.rushRecords.newestRecord.split('-'))
+          //   resolve(res.result.data)
+          // } else {
+          //   resolve([0,-1])
+          // }
+          resolve(res.result.data)
         },
         fail: err => {
           reject(err)
