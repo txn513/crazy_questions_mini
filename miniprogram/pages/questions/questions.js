@@ -19,14 +19,17 @@ Page({
     page: 0,
   },
 
-  getQuestions(){
+  //获取题目
+  getQuestions(recordRes){
     let that = this;
     let { currentIndex} = this.data;
+
+    console.log(recordRes)
     wx.cloud.callFunction({
       // 云函数名称
       name: 'getQuestions',
       data: {
-        page: this.data.page,
+        page: recordRes[0],
         rows: 90,
       },
       // 传给云函数的参数
@@ -35,10 +38,11 @@ Page({
         
       
         that.setData({
+          currentIndex: parseInt(recordRes[1])+1,
           questionList: res.result.data,
           
         })
-      this.getSelections(currentIndex)
+      this.getSelections(this.data.currentIndex)
       })
       .catch(console.error)
   },
@@ -89,11 +93,13 @@ Page({
       })
 
       setTimeout(() => {
+        
         this.setData({
           selectionColorShow: false,
           currentIndex: this.data.currentIndex + 1,
           clickSelec: ''
         })
+        console.log(this.data.currentIndex)
         this.getSelections(this.data.currentIndex)
       }, 3000)
     })
@@ -148,12 +154,41 @@ Page({
 
     }).catch(console.error)
   },
+
+  //获取用户答题信息，例如闯关数
+  getRushRecords(openid) {
+    return new Promise((resolve, reject) => {
+      wx.cloud.callFunction({
+        name: 'getRushRecords',
+        data: {
+          openid
+        },
+        success: res => {
+
+          resolve(res.result.newestRecord.split('-'))
+        },
+        fail: err => {
+          reject(err)
+        }
+      })
+    })
+    
+    // try {
+    //   let res = await f
+    //   console.log(res)
+    // } catch (err){
+    //   console.log(err)
+    // }
+    
+    
+  },
+
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
     let that = this;
-    this.getQuestions()
+    
     wx.getSystemInfo({
       success: function(res) {
         console.log(res)
@@ -161,6 +196,13 @@ Page({
           windowHeight: res.windowHeight
         })
       },
+    })
+
+    //获取闯关数
+    util.ifGotOpenid(app, () => {
+      this.getRushRecords(app.globalData.openid).then(res => {
+        this.getQuestions(res)
+      })
     })
 
   },

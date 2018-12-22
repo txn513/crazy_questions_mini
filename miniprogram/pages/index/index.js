@@ -21,11 +21,6 @@ Page({
       return
     }
 
-    //获取闯关数
-    util.ifGotOpenid(app, () => {
-      this.getRushRecords(app.globalData.openid)
-    })
-
     // 获取用户信息
     wx.getSetting({
       success: res => {
@@ -133,22 +128,6 @@ Page({
       },
       fail: e => {
         console.error(e)
-      }
-    })
-  },
-
-  //获取用户答题信息，例如闯关数
-  getRushRecords(openid){
-    wx.cloud.callFunction({
-      name: 'getRushRecords',
-      data: {
-        openid
-      },
-      success: res => {
-        console.log(res)
-      },
-      fail: err => {
-        
       }
     })
   },
