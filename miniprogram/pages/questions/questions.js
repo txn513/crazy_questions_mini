@@ -164,8 +164,13 @@ Page({
           openid
         },
         success: res => {
-
-          resolve(res.result.newestRecord.split('-'))
+          console.log(res.result)
+          if (res.result) {
+            resolve(res.result.newestRecord.split('-'))
+          } else {
+            resolve([0,-1])
+          }
+          
         },
         fail: err => {
           reject(err)
