@@ -13,7 +13,7 @@ exports.main = async (event, context) => {
     condition = answerCount;
   } else if (event.type == 2){
     //按答题准确率排行
-    
+    condition = accuracyRate;
   }else{
     //按用户等级排行
     condition = userLevel;

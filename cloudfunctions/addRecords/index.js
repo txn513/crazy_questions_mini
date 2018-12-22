@@ -60,6 +60,9 @@ exports.main = async(event, context) => {
       }).update({
           data: {
             answerCount: _.inc(1),
+            errorSum: event.errorSum,
+            correntSum: event.correntSum,
+            accuracyRate: event.accuracyRate,
             updateTime: new Date(new Date().getTime())
           }
         })
