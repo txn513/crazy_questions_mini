@@ -10,14 +10,21 @@ let condition;
 exports.main = async (event, context) => {
   //按答题总数排行
   if(event.type == 1){
-    condition = answerCount;
+    condition = "answerCount";
   } else if (event.type == 2){
     //按答题准确率排行
-    condition = accuracyRate;
+    condition = "accuracyRate";
   }else{
     //按用户等级排行
-    condition = userLevel;
+    condition = "userLevel";
     
   }
-  return res = await userInfo.orderBy(condition, "desc").get();
+  return res = await userInfo.where(_.or([
+    {
+      correntSum: _.gt(0)
+    },
+    {
+      errorSum: _.gt(0)
+    }
+  ])).orderBy(condition, "desc").get();
 }
