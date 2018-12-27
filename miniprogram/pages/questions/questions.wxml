@@ -1,7 +1,13 @@
 <!--miniprogram/pages/questions/questions.wxml-->
 <view class='container'>
   <view class='wrap' style='height: {{windowHeight + "px"}}'>
-    <view class='top' style='height: {{windowHeight/10*1.5 + "px"}}'></view>
+    <view class='top' style='height: {{windowHeight/10*1.5 + "px"}}'>
+      <view class='top-item'></view>
+      <view class='top-item'>
+        <view class='top-item-2' catchtap='popSwitch'>关卡</view>
+      </view>
+      <view class='top-item'></view>
+    </view>
     <view class='question' style='height: {{windowHeight/10*3.2 + "px"}}'>
       <text>{{currentQuestion.questions}}</text>
     </view>
@@ -14,6 +20,19 @@
       <view class='ans-item' data-aws="B" catchtap="awsClick">{{currentQuestion.answer_b}}</view>
       <view class='ans-item' data-aws="C" catchtap="awsClick">{{currentQuestion.answer_c}}</view>
       <view class='ans-item' data-aws="D" catchtap="awsClick">{{currentQuestion.answer_d}}</view> -->
+    </view>
+  </view>
+
+  <view class='level-pop-mask' catchtouchmove='""' catchtap='popSwitch' wx:if="{{levelPopShow}}">
+    <view class='level-pop'>
+      <view class='level-title'>{{levelTitle[newestLevel].title}}</view>
+      <view 
+      class='level-item {{(topLevel < switchLevel) || ((topLevel == switchLevel) && ((topStage-1) < index))? "disabled": ""}}' 
+      wx:for="{{9}}" 
+      data-index="{{index}}" 
+      wx:key="*this"
+      catchtap="stageSelect">第{{index+1}}关</view>
+      
     </view>
   </view>
 </view>

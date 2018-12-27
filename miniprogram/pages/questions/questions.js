@@ -20,7 +20,51 @@ Page({
     disableClick: false,
     accuracyRate: 0,
     correntSum:0,
-    errorSum:0
+    errorSum:0,
+    topStage: 0, //最近关卡数 0开始
+    newestStage: 0, //最高关卡数
+    topLevel: 0,
+    newestLevel: 0, 
+    newestIndex: 0,
+    topIndex: 0,
+    switchLevel: 0, // 手动切换的等级数
+    numPerStage: 10, //每级关卡数
+    levelTitle: [
+      {
+        title: '初学乍到'
+      },
+      {
+        title: '游学四方'
+      },
+      {
+        title: '有学而志'
+      },
+      {
+        title: '青年俊才'
+      },
+      {
+        title: '学长师友'
+      },
+      {
+        title: '初为人师'
+      },
+      {
+        title: '学长师友'
+      },
+      {
+        title: '师者解惑'
+      },
+      {
+        title: '为师有道'
+      },
+      {
+        title: '有智之士'
+      },
+      {
+        title: '智者达观'
+      }
+    ],
+    levelPopShow: false
   },
 
   //获取题目
@@ -139,21 +183,21 @@ Page({
     
   },
 
-  checkAnswer(aws){
-    let { currentQuestion } = this.data;
-    wx.cloud.callFunction({
-      // 云函数名称
-      name: 'checkAnswer',
-      data: {
-        questionId: currentQuestion._id,
-        answer: aws
-      }
-      // 传给云函数的参数
-    }).then(res => {
-      console.log(res.result) // 3
+  // checkAnswer(aws){
+  //   let { currentQuestion } = this.data;
+  //   wx.cloud.callFunction({
+  //     // 云函数名称
+  //     name: 'checkAnswer',
+  //     data: {
+  //       questionId: currentQuestion._id,
+  //       answer: aws
+  //     }
+  //     // 传给云函数的参数
+  //   }).then(res => {
+  //     console.log(res.result) // 3
 
-    }).catch(console.error)
-  },
+  //   }).catch(console.error)
+  // },
 
   addRecords(isTrue){
     let { currentQuestion, accuracyRate, correntSum, errorSum } = this.data;
@@ -215,17 +259,61 @@ Page({
         }
       })
     })
-    
-    // try {
-    //   let res = await f
-    //   console.log(res)
-    // } catch (err){
-    //   console.log(err)
-    // }
-    
-    
   },
 
+  getStageNLevel(rushRecords){
+    console.log(rushRecords)
+    let { numPerStage } = this.data;
+    let { newestRecord, topRecord} = rushRecords;
+    let newestIndex = newestRecord.split('-')[1]
+    let topIndex = topRecord.split('-')[1]
+    let newestLevel = newestRecord.split('-')[0]
+    let topLevel = topRecord.split('-')[0]
+    this.setData({
+      newestStage: Math.round(newestIndex / numPerStage),
+      topStage: Math.round(topIndex / numPerStage),
+      newestLevel,
+      topLevel,
+      newestIndex,
+      topIndex
+    })
+    console.log(this.data.newestStage)
+  },
+
+  popSwitch(){
+    let { levelPopShow } = this.data;
+    levelPopShow && this.setData({ levelPopShow: false })
+    levelPopShow || this.setData({ levelPopShow: true })
+  },
+  stageSelect(e){
+    let { topLevel, switchLevel, topStage, numPerStage, topIndex} = this.data;
+    let { index } = e.currentTarget.dataset;
+    console.log(e)
+    if (topLevel < switchLevel) {
+      return;
+    } else if ((topLevel == switchLevel) && ((topStage - 1) < index)) {
+      return;
+    } else {
+    
+      if ((topStage - 1) == index) {
+        console.log(topIndex)
+        this.setData({
+          currentIndex: parseInt(topIndex)+1
+        })
+        // currentIndex: ,
+      } else {
+        console.log(index * numPerStage)
+        this.setData({
+          currentIndex: index * numPerStage
+        })
+      }
+      
+      this.setData({
+        levelPopShow: false
+      })
+      this.getSelections(this.data.currentIndex)
+    }
+  },
   /**
    * 生命周期函数--监听页面加载
    */
@@ -244,7 +332,9 @@ Page({
     //获取闯关数
     util.ifGotOpenid(app, () => {
       this.getRushRecords(app.globalData.openid).then(res => {
+        console.log(res)
         this.getQuestions(res)
+        this.getStageNLevel(res.rushRecords)
       })
     })
 
