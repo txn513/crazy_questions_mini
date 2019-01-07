@@ -1,0 +1,15 @@
+<!--miniprogram/pages/ranking/ranking.wxml-->
+<view class='container'>
+  <view class='tab'></view>
+  <view class='ranking-list'>
+    <view class='list-item' wx:for="{{rankingList}}" wx:key="_id">
+      <view class='left'>
+        <image src="{{item.avatarUrl}}"></image>
+        <text>{{item.nickName}}</text>
+      </view>
+      <view class='right'>
+        <text>{{item.accuracyRate*100}}%</text>
+      </view>
+    </view>
+  </view>
+</view>

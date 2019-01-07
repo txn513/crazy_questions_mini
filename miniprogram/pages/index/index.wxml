@@ -48,6 +48,12 @@
     <button wx:if="{{canIUse}}" open-type="getUserInfo" bindgetuserinfo="bindGetUserInfo">答题</button>
   </view>
 
+  <view class="uploader">
+      <navigator url="../ranking/ranking" open-type="navigate" class="uploader-text">
+      <text>排行</text>
+    </navigator>
+  </view>
+
 
 <!-- <form bindsubmit="formSubmit">
   <input name="a" type='text' class='input' placeholder='输入a'></input>
